@@ -2,18 +2,18 @@ import { uuid } from 'uuidv4';
 
 class Transaction {
   id: string;
-
-  title: string;
-
+  client: string;
+  reason: string;
   value: number;
+  date: Date;
 
-  type: 'income' | 'outcome';
-
-  constructor({ title, value, type }: Omit<Transaction, 'id'>) {
+  constructor({ client, reason, value, date }: Omit<Transaction, 'id'>) {
     this.id = uuid();
-    this.title = title;
+
+    this.client = client;
+    this.reason = reason;
     this.value = value;
-    this.type = type;
+    this.date = date;
   }
 }
 

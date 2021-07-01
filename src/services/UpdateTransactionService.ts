@@ -2,6 +2,7 @@ import TransactionsRepository from '../repositories/TransactionsRepository';
 import Transaction from '../models/Transaction';
 
 interface RequestDTO {
+  id_transaction: string;
   client: string;
   reason: string;
   value: number;
@@ -15,15 +16,20 @@ class CreateTransactionService {
     this.transactionsRepository = transactionsRepository;
   }
 
-  public execute({ client, reason, value, date }: RequestDTO): Transaction {
+  public execute({ id_transaction, client, reason, value, date }: RequestDTO): Transaction {
 
-    const transaction = this.transactionsRepository.create({
-      client,
-      reason,
-      value,
-      date,
-    });
-    return transaction;
+    const transaction = this.transactionsRepository.findById(id_transaction);
+
+    if (!transaction) {
+      throw new Error('Transaction not found!');
+    }
+
+    transaction.client = client;
+    transaction.reason = reason;
+    transaction.value = value;
+    transaction.date = date;
+
+    return this.transactionsRepository.update(transaction);
   }
 }
 

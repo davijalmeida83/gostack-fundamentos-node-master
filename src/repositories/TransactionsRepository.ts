@@ -1,15 +1,10 @@
 import Transaction from '../models/Transaction';
 
 interface CreateTransactionDTO {
-  title: string;
+  client: string;
+  reason: string;
   value: number;
-  type: 'income' | 'outcome';
-}
-
-interface Balance {
-  income: number;
-  outcome: number;
-  total: number;
+  date: Date;
 }
 
 class TransactionsRepository {
@@ -23,27 +18,41 @@ class TransactionsRepository {
     return this.transactions;
   }
 
-  public getBalance(): Balance {
-    const totalIncome = this.transactions
-      .filter(({ type }) => type === 'income')
-      .reduce((sum, record) => sum + record.value, 0);
-
-    const totalOutcome = this.transactions
-      .filter(({ type }) => type === 'outcome')
-      .reduce((sum, record) => sum + record.value, 0);
-
-    const balance = {
-      income: totalIncome,
-      outcome: totalOutcome,
-      total: totalIncome - totalOutcome,
-    };
-    return balance;
+  public findById(id_transaction: string): Transaction | undefined {
+    const findTransaction = this.transactions.find(
+      transaction => transaction.id === id_transaction,
+    );
+    return findTransaction;
   }
 
-  public create({ title, value, type }: CreateTransactionDTO): Transaction {
-    const transaction = new Transaction({ title, value, type });
+  public create({
+    client,
+    reason,
+    value,
+    date,
+  }: CreateTransactionDTO): Transaction {
+    const transaction = new Transaction({ client, reason, value, date });
     this.transactions.push(transaction);
     return transaction;
+  }
+
+  public update(transaction: Transaction): Transaction {
+    const findIndex = this.transactions.findIndex(
+      findTransaction => findTransaction.id === transaction.id,
+    );
+    this.transactions[findIndex] = transaction;
+
+    return transaction;
+  }
+
+  public delete(id: string): Transaction[] {
+    const findIndex = this.transactions.findIndex(
+      findTransaction => findTransaction.id === id,
+    );
+
+    if (findIndex !== -1) this.transactions.splice(findIndex, 1);
+
+    return this.transactions;
   }
 }
 
